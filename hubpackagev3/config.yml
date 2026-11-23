@@ -1,5 +1,5 @@
-name: 'Envisalink 3.11'
-packageKey: 'envisalinkv3.0'
+name: 'Envisalink 3.11-fix'
+packageKey: 'envisalinkv3.0-fix'
 permissions:
     lan: {}
     discovery: {}
