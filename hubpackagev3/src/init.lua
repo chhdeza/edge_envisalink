@@ -755,6 +755,34 @@ local function handler_driverchanged(driver, device, event, args)
 
   log.debug ('*** Driver changed handler invoked ***')
 
+  -- A driver switch keeps the device's previous profile (and its presentation);
+  -- re-apply this driver's profile by name so the new metadata takes effect.
+  local zone_profiles = {
+    ["contact"] = "DSC.contactzone.v3",
+    ["motion"] = "DSC.motionzone.v3",
+    ["smoke"] = "DSC.smokezone.v3",
+    ["co"] = "DSC.cozone.v3",
+    ["water"] = "DSC.waterzone.v3",
+  }
+
+  local dni = device.device_network_id or ''
+  local profile
+
+  if dni == 'DSC:P1' then
+    profile = "DSC.primarypanel.v3d"
+  elseif dni:find('DSC:P', 1, 'plaintext') == 1 then
+    profile = "DSC.secondarypanel.v3d"
+  elseif dni:find('DSC:Z', 1, 'plaintext') == 1 then
+    profile = zone_profiles[(device.model or ''):match('^DSC%-(%w+)')]
+  end
+
+  if profile then
+    log.info (string.format('Re-applying profile %s to %s', profile, dni))
+    device:try_update_metadata({profile = profile})
+  else
+    log.warn ('No profile mapping for ' .. dni)
+  end
+
 end
 
 -- **************************
